@@ -1,0 +1,13 @@
+syntax = "proto3";
+package emp;
+option go_package = "./";
+
+message Message {
+  string name = 1;
+  string organization = 2;
+  int64 mobile = 3;
+}
+
+service EmpService {
+  rpc EmitEmp(Message) returns (Message) {}
+}

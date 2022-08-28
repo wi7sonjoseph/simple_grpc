@@ -1,32 +1,30 @@
 package main
 
 import (
-    "fmt"
-    pb "simple_grpc/protofiles"
-    "google.golang.org/protobuf/proto"
+	"fmt"
+	"log"
+	"net"
+
+	"github.com/wi7sonjoseph/simple_grpc/emp"
+	"google.golang.org/grpc"
 )
 
 func main() {
 
-    // using the profo created struct
-    p := &pb.Person{
-        Id: 1234,
-        Name: "John Doe",
-        Email: "test@test.com",
-        Phones: []*pb.Person_PhoneNumber{
-            {Number: "555-444", Type: pb.Person_HOME},
-        },
-    }
+	fmt.Println("Go gRPC Beginners Tutorial!")
 
-    // Serializing the struct and assigning it to body
-    body, _ := proto.Marshal(p)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 
-    // De-serializing the body and saving it to p1 for testing
-    p1 := &pb.Person{}
-    _ = proto.Unmarshal(body, p1)
+	s := emp.Server{}
 
-    fmt.Println("Original struct loaded from proto file:", p)
-    fmt.Println("Marshalled proto data: ", body)
-    fmt.Println("Unmarshalled struct: ", p1)
+	grpcServer := grpc.NewServer()
 
+	emp.RegisterChatServiceServer(grpcServer, &s)
+
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %s", err)
+	}
 }
